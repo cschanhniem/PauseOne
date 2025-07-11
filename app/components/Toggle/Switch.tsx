@@ -1,23 +1,22 @@
 import { useEffect, useMemo, useRef, useCallback } from "react"
-import { Animated, Image, ImageStyle, Platform, StyleProp, View, ViewStyle } from "react-native"
-
-import { iconRegistry } from "@/components/Icon"
-import { isRTL } from "@/i18n"
-import { useAppTheme } from "@/theme/context"
-import { $styles } from "@/theme/styles"
-import type { ThemedStyle } from "@/theme/types"
+import {
+  Animated,
+  Image,
+  ImageStyle,
+  Platform,
+  StyleProp,
+  View,
+  ViewStyle,
+  StyleSheet,
+} from "react-native"
 
 import { $inputOuterBase, BaseToggleInputProps, Toggle, ToggleProps } from "./Toggle"
+import { iconRegistry } from "../../components/Icon"
+import { isRTL } from "../../i18n"
+import { colors } from "../../theme/colors"
 
 export interface SwitchToggleProps extends Omit<ToggleProps<SwitchInputProps>, "ToggleInput"> {
-  /**
-   * Switch-only prop that adds a text/icon label for on/off states.
-   */
   accessibilityMode?: "text" | "icon"
-  /**
-   * Optional style prop that affects the knob View.
-   * Note: `width` and `height` rules should be points (numbers), not percentages.
-   */
   inputDetailStyle?: Omit<ViewStyle, "width" | "height"> & { width?: number; height?: number }
 }
 
@@ -25,11 +24,6 @@ interface SwitchInputProps extends BaseToggleInputProps<SwitchToggleProps> {
   accessibilityMode?: SwitchToggleProps["accessibilityMode"]
 }
 
-/**
- * @param {SwitchToggleProps} props - The props for the `Switch` component.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Switch}
- * @returns {JSX.Element} The rendered `Switch` component.
- */
 export function Switch(props: SwitchToggleProps) {
   const { accessibilityMode, ...rest } = props
   const switchInput = useCallback(
@@ -51,19 +45,14 @@ function SwitchInput(props: SwitchInputProps) {
     detailStyle: $detailStyleOverride,
   } = props
 
-  const {
-    theme: { colors },
-    themed,
-  } = useAppTheme()
-
-  const animate = useRef(new Animated.Value(on ? 1 : 0)) // Initial value is set based on isActive
+  const animate = useRef(new Animated.Value(on ? 1 : 0))
   const opacity = useRef(new Animated.Value(0))
 
   useEffect(() => {
     Animated.timing(animate.current, {
       toValue: on ? 1 : 0,
       duration: 300,
-      useNativeDriver: true, // Enable native driver for smoother animations
+      useNativeDriver: true,
     }).start()
   }, [on])
 
@@ -86,15 +75,15 @@ function SwitchInput(props: SwitchInputProps) {
   )
 
   const offBackgroundColor = [
-    disabled && colors.palette.neutral400,
+    disabled && colors.textDim,
     status === "error" && colors.errorBackground,
-    colors.palette.neutral300,
+    colors.palette.glass,
   ].filter(Boolean)[0]
 
   const onBackgroundColor = [
     disabled && colors.transparent,
     status === "error" && colors.errorBackground,
-    colors.palette.secondary500,
+    colors.tint,
   ].filter(Boolean)[0]
 
   const knobBackgroundColor = (function () {
@@ -102,32 +91,32 @@ function SwitchInput(props: SwitchInputProps) {
       return [
         $detailStyleOverride?.backgroundColor,
         status === "error" && colors.error,
-        disabled && colors.palette.neutral600,
-        colors.palette.neutral100,
+        disabled && colors.textDim,
+        colors.palette.white,
       ].filter(Boolean)[0]
     } else {
       return [
         $innerStyleOverride?.backgroundColor,
-        disabled && colors.palette.neutral600,
+        disabled && colors.textDim,
         status === "error" && colors.error,
-        colors.palette.neutral200,
+        colors.palette.glass,
       ].filter(Boolean)[0]
     }
   })()
 
   const rtlAdjustment = isRTL ? -1 : 1
-  const $themedSwitchInner = useMemo(() => themed([$styles.toggleInner, $switchInner]), [themed])
+  const $themedSwitchInner = useMemo(() => [$switchInner], [])
 
   const offsetLeft = ($innerStyleOverride?.paddingStart ||
     $innerStyleOverride?.paddingLeft ||
-    $themedSwitchInner?.paddingStart ||
-    $themedSwitchInner?.paddingLeft ||
+    $themedSwitchInner[0]?.paddingStart ||
+    $themedSwitchInner[0]?.paddingLeft ||
     0) as number
 
   const offsetRight = ($innerStyleOverride?.paddingEnd ||
     $innerStyleOverride?.paddingRight ||
-    $themedSwitchInner?.paddingEnd ||
-    $themedSwitchInner?.paddingRight ||
+    $themedSwitchInner[0]?.paddingEnd ||
+    $themedSwitchInner[0]?.paddingRight ||
     0) as number
 
   const outputRange =
@@ -169,16 +158,8 @@ function SwitchInput(props: SwitchInputProps) {
   )
 }
 
-/**
- * @param {ToggleInputProps & { role: "on" | "off" }} props - The props for the `SwitchAccessibilityLabel` component.
- * @returns {JSX.Element} The rendered `SwitchAccessibilityLabel` component.
- */
 function SwitchAccessibilityLabel(props: SwitchInputProps & { role: "on" | "off" }) {
   const { on, disabled, status, accessibilityMode, role, innerStyle, detailStyle } = props
-
-  const {
-    theme: { colors },
-  } = useAppTheme()
 
   if (!accessibilityMode) return null
 
@@ -191,10 +172,10 @@ function SwitchAccessibilityLabel(props: SwitchInputProps & { role: "on" | "off"
   ]
 
   const color = (function () {
-    if (disabled) return colors.palette.neutral600
+    if (disabled) return colors.textDim
     if (status === "error") return colors.error
-    if (!on) return innerStyle?.backgroundColor || colors.palette.secondary500
-    return detailStyle?.backgroundColor || colors.palette.neutral100
+    if (!on) return innerStyle?.backgroundColor || colors.tint
+    return detailStyle?.backgroundColor || colors.palette.white
   })()
 
   return (
@@ -225,12 +206,12 @@ const $inputOuter: StyleProp<ViewStyle> = [
   { height: 32, width: 56, borderRadius: 16, borderWidth: 0 },
 ]
 
-const $switchInner: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $switchInner: ViewStyle = {
   borderColor: colors.transparent,
-  position: "absolute",
   paddingStart: 4,
   paddingEnd: 4,
-})
+  ...StyleSheet.absoluteFillObject,
+}
 
 const $switchDetail: SwitchToggleProps["inputDetailStyle"] = {
   borderRadius: 12,

@@ -54,6 +54,39 @@ const MyComponent = () => {
 };
 ```
 
+## Code Quality & Pre-commit Hooks
+
+This project is configured with Husky and ESLint to maintain code quality:
+
+### ESLint Configuration
+
+- **File Length Limit**: Maximum 400 lines per file (excludes demo translation files)
+- **Import Organization**: Automatic import sorting and grouping
+- **React Best Practices**: No React default imports, proper component usage
+- **TypeScript Rules**: Unused variable detection with underscore prefix exceptions
+
+### Pre-commit Hooks
+
+Pre-commit hooks automatically run when you commit code:
+
+```bash
+# Runs automatically on commit
+git commit -m "your message"
+```
+
+The hooks will:
+
+1. Run ESLint with auto-fix on staged `.js`, `.jsx`, `.ts`, `.tsx` files
+2. Run Prettier on staged `.json` and `.md` files
+3. Prevent commit if linting errors exist
+
+### Manual Commands
+
+```bash
+yarn lint          # Run ESLint with auto-fix
+yarn lint:check    # Run ESLint without auto-fix (CI mode)
+```
+
 ## Running Maestro end-to-end tests
 
 Follow our [Maestro Setup](https://ignitecookbook.com/docs/recipes/MaestroSetup) recipe.

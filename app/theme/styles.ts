@@ -9,8 +9,8 @@ export const $styles = {
   flexWrap: { flexWrap: "wrap" } as ViewStyle,
 
   container: {
-    paddingTop: spacing.lg + spacing.xl,
-    paddingHorizontal: spacing.lg,
+    paddingTop: spacing[3] + spacing[4],
+    paddingHorizontal: spacing[3],
   } as ViewStyle,
 
   toggleInner: {

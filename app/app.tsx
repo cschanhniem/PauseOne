@@ -21,6 +21,7 @@ import "./utils/gestureHandler"
 import { useEffect, useState } from "react"
 import { useFonts } from "expo-font"
 import * as Linking from "expo-linking"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 import { KeyboardProvider } from "react-native-keyboard-controller"
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context"
 
@@ -39,19 +40,8 @@ export const NAVIGATION_PERSISTENCE_KEY = "NAVIGATION_STATE"
 const prefix = Linking.createURL("/")
 const config = {
   screens: {
-    Login: {
+    Home: {
       path: "",
-    },
-    Welcome: "welcome",
-    Demo: {
-      screens: {
-        DemoShowroom: {
-          path: "showroom/:queryIndex?/:itemIndex?",
-        },
-        DemoDebug: "debug",
-        DemoPodcastList: "podcast",
-        DemoCommunity: "community",
-      },
     },
   },
 }
@@ -87,6 +77,12 @@ export function App() {
     return null
   }
 
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/service-worker.js")
+    })
+  }
+
   const linking = {
     prefixes: [prefix],
     config,
@@ -94,18 +90,24 @@ export function App() {
 
   // otherwise, we're ready to render the app
   return (
-    <SafeAreaProvider initialMetrics={initialWindowMetrics}>
-      <KeyboardProvider>
-        <AuthProvider>
-          <ThemeProvider>
-            <AppNavigator
-              linking={linking}
-              initialState={initialNavigationState}
-              onStateChange={onNavigationStateChange}
-            />
-          </ThemeProvider>
-        </AuthProvider>
-      </KeyboardProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={$gestureHandlerRoot}>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
+        <KeyboardProvider>
+          <AuthProvider>
+            <ThemeProvider>
+              <AppNavigator
+                linking={linking}
+                initialState={initialNavigationState}
+                onStateChange={onNavigationStateChange}
+              />
+            </ThemeProvider>
+          </AuthProvider>
+        </KeyboardProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   )
+}
+
+const $gestureHandlerRoot = {
+  flex: 1,
 }

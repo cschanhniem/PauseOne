@@ -26,11 +26,13 @@
     "build:android:sim": "eas build --profile development --platform android --local",
     "build:android:dev": "eas build --profile development:device --platform android --local",
     "build:android:preview": "eas build --profile preview --platform android --local",
-    "build:android:prod": "eas build --profile production --platform android --local"
+    "build:android:prod": "eas build --profile production --platform android --local",
+    "prepare": "husky"
   },
   "dependencies": {
     "@expo-google-fonts/space-grotesk": "^0.4.0",
     "@expo/metro-runtime": "~5.0.4",
+    "@react-native-async-storage/async-storage": "2.1.2",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "@react-navigation/native-stack": "^7.2.0",
@@ -42,8 +44,11 @@
     "expo-build-properties": "~0.14.6",
     "expo-dev-client": "~5.2.1",
     "expo-font": "~13.3.0",
+    "expo-haptics": "^14.1.4",
+    "expo-linear-gradient": "^14.1.5",
     "expo-linking": "~7.1.4",
     "expo-localization": "~16.1.5",
+    "expo-sharing": "^13.1.5",
     "expo-splash-screen": "~0.30.9",
     "expo-system-ui": "~5.0.9",
     "i18next": "^23.14.0",
@@ -60,6 +65,7 @@
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
+    "react-native-svg": "15.11.2",
     "react-native-web": "^0.20.0"
   },
   "devDependencies": {
@@ -76,8 +82,10 @@
     "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react-native": "^4.1.0",
     "eslint-plugin-reactotron": "^0.1.2",
+    "husky": "^9.1.7",
     "jest": "~29.7.0",
     "jest-expo": "~53.0.7",
+    "lint-staged": "^16.1.2",
     "prettier": "^3.3.3",
     "react-test-renderer": "19.0.0",
     "reactotron-core-client": "^2.9.4",
@@ -97,5 +105,14 @@
         "@shopify/flash-list"
       ]
     }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
   }
 }

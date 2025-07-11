@@ -3,62 +3,30 @@ import { ReactNode, forwardRef, ForwardedRef } from "react"
 import { StyleProp, Text as RNText, TextProps as RNTextProps, TextStyle } from "react-native"
 import { TOptions } from "i18next"
 
-import { isRTL, TxKeyPath } from "@/i18n"
-import { translate } from "@/i18n/translate"
-import { useAppTheme } from "@/theme/context"
-import type { ThemedStyle, ThemedStyleArray } from "@/theme/types"
-import { typography } from "@/theme/typography"
+import { useLargeText } from "../hooks/useLargeText"
+import { isRTL, TxKeyPath } from "../i18n"
+import { translate } from "../i18n/translate"
+import { colors } from "../theme/colors"
+import { typography } from "../theme/typography"
 
 type Sizes = keyof typeof $sizeStyles
 type Weights = keyof typeof typography.primary
 type Presets = "default" | "bold" | "heading" | "subheading" | "formLabel" | "formHelper"
 
 export interface TextProps extends RNTextProps {
-  /**
-   * Text which is looked up via i18n.
-   */
   tx?: TxKeyPath
-  /**
-   * The text to display if not using `tx` or nested components.
-   */
   text?: string
-  /**
-   * Optional options to pass to i18n. Useful for interpolation
-   * as well as explicitly setting locale or translation fallbacks.
-   */
   txOptions?: TOptions
-  /**
-   * An optional style override useful for padding & margin.
-   */
   style?: StyleProp<TextStyle>
-  /**
-   * One of the different types of text presets.
-   */
   preset?: Presets
-  /**
-   * Text weight modifier.
-   */
   weight?: Weights
-  /**
-   * Text size modifier.
-   */
   size?: Sizes
-  /**
-   * Children components.
-   */
   children?: ReactNode
 }
 
-/**
- * For your text displaying needs.
- * This component is a HOC over the built-in React Native one.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Text/}
- * @param {TextProps} props - The props for the `Text` component.
- * @returns {JSX.Element} The rendered `Text` component.
- */
 export const Text = forwardRef(function Text(props: TextProps, ref: ForwardedRef<RNText>) {
   const { weight, size, tx, txOptions, text, children, style: $styleOverride, ...rest } = props
-  const { themed } = useAppTheme()
+  const isLargeText = useLargeText()
 
   const i18nText = tx && translate(tx, txOptions)
   const content = i18nText || text || children
@@ -66,9 +34,10 @@ export const Text = forwardRef(function Text(props: TextProps, ref: ForwardedRef
   const preset: Presets = props.preset ?? "default"
   const $styles: StyleProp<TextStyle> = [
     $rtlStyle,
-    themed($presets[preset]),
+    $presets[preset],
     weight && $fontWeightStyles[weight],
     size && $sizeStyles[size],
+    isLargeText && { fontSize: ($sizeStyles[size || "sm"]?.fontSize || 16) * 1.2 },
     $styleOverride,
   ]
 
@@ -93,24 +62,22 @@ const $fontWeightStyles = Object.entries(typography.primary).reduce((acc, [weigh
   return { ...acc, [weight]: { fontFamily } }
 }, {}) as Record<Weights, TextStyle>
 
-const $baseStyle: ThemedStyle<TextStyle> = (theme) => ({
+const $baseStyle: TextStyle = {
   ...$sizeStyles.sm,
   ...$fontWeightStyles.normal,
-  color: theme.colors.text,
-})
+  color: colors.text,
+}
 
-const $presets: Record<Presets, ThemedStyleArray<TextStyle>> = {
-  default: [$baseStyle],
-  bold: [$baseStyle, { ...$fontWeightStyles.bold }],
-  heading: [
-    $baseStyle,
-    {
-      ...$sizeStyles.xxl,
-      ...$fontWeightStyles.bold,
-    },
-  ],
-  subheading: [$baseStyle, { ...$sizeStyles.lg, ...$fontWeightStyles.medium }],
-  formLabel: [$baseStyle, { ...$fontWeightStyles.medium }],
-  formHelper: [$baseStyle, { ...$sizeStyles.sm, ...$fontWeightStyles.normal }],
+const $presets: Record<Presets, TextStyle> = {
+  default: $baseStyle,
+  bold: { ...$baseStyle, ...$fontWeightStyles.bold },
+  heading: {
+    ...$baseStyle,
+    ...$sizeStyles.xxl,
+    ...$fontWeightStyles.bold,
+  },
+  subheading: { ...$baseStyle, ...$sizeStyles.lg, ...$fontWeightStyles.regular },
+  formLabel: { ...$baseStyle, ...$fontWeightStyles.regular },
+  formHelper: { ...$baseStyle, ...$sizeStyles.sm, ...$fontWeightStyles.normal },
 }
 const $rtlStyle: TextStyle = isRTL ? { writingDirection: "rtl" } : {}

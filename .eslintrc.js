@@ -101,5 +101,28 @@ module.exports = {
       },
     ],
     "import/newline-after-import": 1,
+    // File length limits
+    "max-lines": [
+      "error",
+      {
+        max: 400,
+        skipBlankLines: true,
+        skipComments: true,
+      },
+    ],
   },
+  overrides: [
+    {
+      files: ["app/i18n/demo-*.ts"],
+      rules: {
+        "max-lines": "off",
+      },
+    },
+    {
+      files: ["public/service-worker.js"],
+      env: {
+        serviceworker: true,
+      },
+    },
+  ],
 }

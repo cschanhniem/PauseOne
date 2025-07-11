@@ -1,0 +1,26 @@
+# Task: Feature Implementation
+
+- [x] **1. Core Experience**:
+  - [x] Implement the 60-second session timer on button tap.
+  - [x] Implement the micro-session picker (30s / 60s / 120s) on long-press.
+  - [x] Implement silent haptic guidance during the breathing exercise.
+- [x] **2. Personal Calm Layer**:
+  - [ ] Implement the adaptive pace feature (optional).
+  - [x] Implement the guilt-free streak ring logic.
+  - [x] Implement the theme quick-swap feature.
+- [x] **3. Organic Growth Hooks**:
+  - [x] Implement the "Share-A-Pause" link feature.
+  - [ ] Implement the lock-screen widget.
+- [x] **4. Platform & Access**:
+  - [x] Configure the app as a PWA.
+  - [x] Implement offline-first caching.
+- [ ] **5. Monetization**: (delayed)
+  - [ ] Implement the one-time forever unlock feature.
+  - [ ] Implement the team pulse dashboard (requires a backend).
+- [x] **6. Delight Extras**:
+  - [x] Implement the end-card affirmations.
+  - [x] Implement the gestural easter egg.
+- [x] **7. Compliance & Care**:
+  - [x] Implement the large text toggle.
+  - [x] Implement the `prefers-reduced-motion` feature.
+  - [x] Implement local data storage for stats.

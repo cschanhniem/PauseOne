@@ -1,53 +1,34 @@
-// TODO: write documentation about fonts and typography along with guides on how to add custom fonts in own
-// markdown file and add links from here
-
 import { Platform } from "react-native"
-import {
-  SpaceGrotesk_300Light as spaceGroteskLight,
-  SpaceGrotesk_400Regular as spaceGroteskRegular,
-  SpaceGrotesk_500Medium as spaceGroteskMedium,
-  SpaceGrotesk_600SemiBold as spaceGroteskSemiBold,
-  SpaceGrotesk_700Bold as spaceGroteskBold,
-} from "@expo-google-fonts/space-grotesk"
 
-export const customFontsToLoad = {
-  spaceGroteskLight,
-  spaceGroteskRegular,
-  spaceGroteskMedium,
-  spaceGroteskSemiBold,
-  spaceGroteskBold,
-}
+import { typography as tokenTypography } from "./tokens"
+
+// We are not loading custom fonts via this mechanism anymore.
+// "Plus Jakarta Sans" should be loaded via web-specific means (e.g., index.html)
+// and included in the native assets.
+export const customFontsToLoad = {}
 
 const fonts = {
-  spaceGrotesk: {
-    // Cross-platform Google font.
-    light: "spaceGroteskLight",
-    normal: "spaceGroteskRegular",
-    medium: "spaceGroteskMedium",
-    semiBold: "spaceGroteskSemiBold",
-    bold: "spaceGroteskBold",
+  jakarta: {
+    // The primary font for the app, as defined in the design system.
+    // The font string is pulled from our design tokens.
+    normal: tokenTypography.fontSans,
+    // Define weights based on the design system.
+    // Note: React Native uses `fontWeight` which can be a string like '400' or '600'.
+    regular: "400",
+    bold: "600",
   },
+  // Keep fallback fonts for platform-specific cases if needed.
   helveticaNeue: {
-    // iOS only font.
     thin: "HelveticaNeue-Thin",
     light: "HelveticaNeue-Light",
     normal: "Helvetica Neue",
     medium: "HelveticaNeue-Medium",
   },
-  courier: {
-    // iOS only font.
-    normal: "Courier",
-  },
   sansSerif: {
-    // Android only font.
     thin: "sans-serif-thin",
     light: "sans-serif-light",
     normal: "sans-serif",
     medium: "sans-serif-medium",
-  },
-  monospace: {
-    // Android only font.
-    normal: "monospace",
   },
 }
 
@@ -59,7 +40,7 @@ export const typography = {
   /**
    * The primary font. Used in most places.
    */
-  primary: fonts.spaceGrotesk,
+  primary: fonts.jakarta,
   /**
    * An alternate font used for perhaps titles and stuff.
    */
@@ -67,5 +48,5 @@ export const typography = {
   /**
    * Lets get fancy with a monospace font!
    */
-  code: Platform.select({ ios: fonts.courier, android: fonts.monospace }),
+  code: Platform.select({ ios: { fontFamily: "Courier" }, android: { fontFamily: "monospace" } }),
 }

@@ -11,13 +11,12 @@ import {
   ViewStyle,
 } from "react-native"
 
-import { isRTL } from "@/i18n"
-import { translate } from "@/i18n/translate"
-import { useAppTheme } from "@/theme/context"
-import { $styles } from "@/theme/styles"
-import type { ThemedStyle, ThemedStyleArray } from "@/theme/types"
-
+import { isRTL } from "../i18n"
 import { Text, TextProps } from "./Text"
+import { translate } from "../i18n/translate"
+import { colors } from "../theme/colors"
+import { spacing } from "../theme/spacing"
+import { typography } from "../theme/typography"
 
 export interface TextFieldAccessoryProps {
   style: StyleProp<ViewStyle | TextStyle | ImageStyle>
@@ -27,89 +26,25 @@ export interface TextFieldAccessoryProps {
 }
 
 export interface TextFieldProps extends Omit<TextInputProps, "ref"> {
-  /**
-   * A style modifier for different input states.
-   */
   status?: "error" | "disabled"
-  /**
-   * The label text to display if not using `labelTx`.
-   */
   label?: TextProps["text"]
-  /**
-   * Label text which is looked up via i18n.
-   */
   labelTx?: TextProps["tx"]
-  /**
-   * Optional label options to pass to i18n. Useful for interpolation
-   * as well as explicitly setting locale or translation fallbacks.
-   */
   labelTxOptions?: TextProps["txOptions"]
-  /**
-   * Pass any additional props directly to the label Text component.
-   */
   LabelTextProps?: TextProps
-  /**
-   * The helper text to display if not using `helperTx`.
-   */
   helper?: TextProps["text"]
-  /**
-   * Helper text which is looked up via i18n.
-   */
   helperTx?: TextProps["tx"]
-  /**
-   * Optional helper options to pass to i18n. Useful for interpolation
-   * as well as explicitly setting locale or translation fallbacks.
-   */
   helperTxOptions?: TextProps["txOptions"]
-  /**
-   * Pass any additional props directly to the helper Text component.
-   */
   HelperTextProps?: TextProps
-  /**
-   * The placeholder text to display if not using `placeholderTx`.
-   */
   placeholder?: TextProps["text"]
-  /**
-   * Placeholder text which is looked up via i18n.
-   */
   placeholderTx?: TextProps["tx"]
-  /**
-   * Optional placeholder options to pass to i18n. Useful for interpolation
-   * as well as explicitly setting locale or translation fallbacks.
-   */
   placeholderTxOptions?: TextProps["txOptions"]
-  /**
-   * Optional input style override.
-   */
   style?: StyleProp<TextStyle>
-  /**
-   * Style overrides for the container
-   */
   containerStyle?: StyleProp<ViewStyle>
-  /**
-   * Style overrides for the input wrapper
-   */
   inputWrapperStyle?: StyleProp<ViewStyle>
-  /**
-   * An optional component to render on the right side of the input.
-   * Example: `RightAccessory={(props) => <Icon icon="ladybug" containerStyle={props.style} color={props.editable ? colors.textDim : colors.text} />}`
-   * Note: It is a good idea to memoize this.
-   */
   RightAccessory?: ComponentType<TextFieldAccessoryProps>
-  /**
-   * An optional component to render on the left side of the input.
-   * Example: `LeftAccessory={(props) => <Icon icon="ladybug" containerStyle={props.style} color={props.editable ? colors.textDim : colors.text} />}`
-   * Note: It is a good idea to memoize this.
-   */
   LeftAccessory?: ComponentType<TextFieldAccessoryProps>
 }
 
-/**
- * A component that allows for the entering and editing of text.
- * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/TextField/}
- * @param {TextFieldProps} props - The props for the `TextField` component.
- * @returns {JSX.Element} The rendered `TextField` component.
- */
 export const TextField = forwardRef(function TextField(props: TextFieldProps, ref: Ref<TextInput>) {
   const {
     labelTx,
@@ -133,11 +68,6 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
   } = props
   const input = useRef<TextInput>(null)
 
-  const {
-    themed,
-    theme: { colors },
-  } = useAppTheme()
-
   const disabled = TextInputProps.editable === false || status === "disabled"
 
   const placeholderContent = placeholderTx
@@ -149,7 +79,6 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
   const $labelStyles = [$labelStyle, LabelTextProps?.style]
 
   const $inputWrapperStyles = [
-    $styles.row,
     $inputWrapperStyle,
     status === "error" && { borderColor: colors.error },
     TextInputProps.multiline && { minHeight: 112 },
@@ -158,11 +87,10 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     $inputWrapperStyleOverride,
   ]
 
-  const $inputStyles: ThemedStyleArray<TextStyle> = [
+  const $inputStyles = [
     $inputStyle,
     disabled && { color: colors.textDim },
     isRTL && { textAlign: "right" as TextStyle["textAlign"] },
-    TextInputProps.multiline && { height: "auto" },
     $inputStyleOverride,
   ]
 
@@ -172,9 +100,6 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
     HelperTextProps?.style,
   ]
 
-  /**
-   *
-   */
   function focusInput() {
     if (disabled) return
 
@@ -197,14 +122,14 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           tx={labelTx}
           txOptions={labelTxOptions}
           {...LabelTextProps}
-          style={themed($labelStyles)}
+          style={$labelStyles}
         />
       )}
 
-      <View style={themed($inputWrapperStyles)}>
+      <View style={$inputWrapperStyles}>
         {!!LeftAccessory && (
           <LeftAccessory
-            style={themed($leftAccessoryStyle)}
+            style={$leftAccessoryStyle}
             status={status}
             editable={!disabled}
             multiline={TextInputProps.multiline ?? false}
@@ -219,12 +144,12 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           placeholderTextColor={colors.textDim}
           {...TextInputProps}
           editable={!disabled}
-          style={themed($inputStyles)}
+          style={$inputStyles}
         />
 
         {!!RightAccessory && (
           <RightAccessory
-            style={themed($rightAccessoryStyle)}
+            style={$rightAccessoryStyle}
             status={status}
             editable={!disabled}
             multiline={TextInputProps.multiline ?? false}
@@ -239,54 +164,54 @@ export const TextField = forwardRef(function TextField(props: TextFieldProps, re
           tx={helperTx}
           txOptions={helperTxOptions}
           {...HelperTextProps}
-          style={themed($helperStyles)}
+          style={$helperStyles}
         />
       )}
     </TouchableOpacity>
   )
 })
 
-const $labelStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginBottom: spacing.xs,
-})
+const $labelStyle: TextStyle = {
+  marginBottom: spacing[2],
+}
 
-const $inputWrapperStyle: ThemedStyle<ViewStyle> = ({ colors }) => ({
+const $inputWrapperStyle: ViewStyle = {
+  flexDirection: "row",
   alignItems: "flex-start",
   borderWidth: 1,
   borderRadius: 4,
-  backgroundColor: colors.palette.neutral200,
-  borderColor: colors.palette.neutral400,
+  backgroundColor: colors.palette.glass,
+  borderColor: colors.border,
   overflow: "hidden",
-})
+}
 
-const $inputStyle: ThemedStyle<TextStyle> = ({ colors, typography, spacing }) => ({
+const $inputStyle: TextStyle = {
   flex: 1,
   alignSelf: "stretch",
   fontFamily: typography.primary.normal,
   color: colors.text,
   fontSize: 16,
   height: 24,
-  // https://github.com/facebook/react-native/issues/21720#issuecomment-532642093
   paddingVertical: 0,
   paddingHorizontal: 0,
-  marginVertical: spacing.xs,
-  marginHorizontal: spacing.sm,
-})
+  marginVertical: spacing[2],
+  marginHorizontal: spacing[2],
+}
 
-const $helperStyle: ThemedStyle<TextStyle> = ({ spacing }) => ({
-  marginTop: spacing.xs,
-})
+const $helperStyle: TextStyle = {
+  marginTop: spacing[2],
+}
 
-const $rightAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginEnd: spacing.xs,
+const $rightAccessoryStyle: ViewStyle = {
+  marginEnd: spacing[2],
   height: 40,
   justifyContent: "center",
   alignItems: "center",
-})
+}
 
-const $leftAccessoryStyle: ThemedStyle<ViewStyle> = ({ spacing }) => ({
-  marginStart: spacing.xs,
+const $leftAccessoryStyle: ViewStyle = {
+  marginStart: spacing[2],
   height: 40,
   justifyContent: "center",
   alignItems: "center",
-})
+}
