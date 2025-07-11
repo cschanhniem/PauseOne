@@ -3,16 +3,9 @@ import { Animated, ViewStyle, TextStyle } from "react-native"
 import { LinearGradient } from "expo-linear-gradient"
 
 import { Text } from "./Text"
+import { getRandomAffirmation } from "../services/affirmationService"
 import { spacing } from "../theme/spacing"
 import { color } from "../theme/tokens"
-
-const affirmations = [
-  "You are enough.",
-  "You are capable of amazing things.",
-  "You are in the right place, at the right time.",
-  "You are calm and at peace.",
-  "You are strong and resilient.",
-]
 
 interface AffirmationCardProps {
   visible: boolean
@@ -24,8 +17,8 @@ export function AffirmationCard({ visible }: AffirmationCardProps) {
 
   useEffect(() => {
     if (visible) {
-      const randomIndex = Math.floor(Math.random() * affirmations.length)
-      setAffirmation(affirmations[randomIndex])
+      const randomAffirmation = getRandomAffirmation()
+      setAffirmation(randomAffirmation)
       Animated.timing(opacity, {
         toValue: 1,
         duration: 1000,
