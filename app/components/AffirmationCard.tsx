@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { Animated, ViewStyle } from "react-native"
+import { Animated, ViewStyle, TextStyle } from "react-native"
+import { LinearGradient } from "expo-linear-gradient"
 
-import { GlassCard } from "./GlassCard"
 import { Text } from "./Text"
+import { spacing } from "../theme/spacing"
+import { color } from "../theme/tokens"
 
 const affirmations = [
   "You are enough.",
@@ -59,16 +61,31 @@ export function AffirmationCard({ visible }: AffirmationCardProps) {
 
   return (
     <Animated.View style={[$container, { opacity }]}>
-      <GlassCard>
-        <Text text={affirmation} />
-      </GlassCard>
+      <LinearGradient
+        colors={[color.primaryStart, color.primaryEnd]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={$gradientText}
+      >
+        <Text text={affirmation} preset="subheading" style={$affirmationText} />
+      </LinearGradient>
     </Animated.View>
   )
 }
 
 const $container: ViewStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "10%",
-  right: "10%",
+  marginTop: spacing[3],
+  paddingHorizontal: spacing[4],
+}
+
+const $gradientText: ViewStyle = {
+  borderRadius: 20,
+  paddingVertical: spacing[2],
+  paddingHorizontal: spacing[3],
+}
+
+const $affirmationText: TextStyle = {
+  textAlign: "center",
+  color: "white",
+  fontWeight: "600",
 }

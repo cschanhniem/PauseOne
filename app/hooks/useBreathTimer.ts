@@ -9,18 +9,17 @@ export const useBreathTimer = (initialDuration: number) => {
 
   useEffect(() => {
     if (isActive) {
-      Haptics.selectionAsync()
       timerRef.current = setInterval(() => {
-        Haptics.selectionAsync()
         setRemainingTime((prevTime) => {
           if (prevTime <= 1) {
             clearInterval(timerRef.current!)
             setIsActive(false)
+            Haptics.selectionAsync() // Haptic feedback when timer completes
             return duration
           }
           return prevTime - 1
         })
-      }, 4000) // 4 seconds inhale, 4 seconds exhale
+      }, 1000) // Update every 1 second
     } else {
       if (timerRef.current) {
         clearInterval(timerRef.current)

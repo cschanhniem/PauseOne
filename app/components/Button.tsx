@@ -67,12 +67,13 @@ const $baseViewStyle: ViewStyle = {
   justifyContent: "center",
   alignItems: "center",
   paddingVertical: spacing[3],
-  paddingHorizontal: spacing[3],
+  paddingHorizontal: spacing[4],
   width: "100%",
   backgroundColor: colors.palette.glass,
   overflow: "hidden",
   borderWidth: 1,
-  borderColor: "rgba(255, 255, 255, 0.15)",
+  borderColor: colors.border,
+  marginVertical: spacing[2],
 }
 
 const $pressedViewStyle: ViewStyle = {
