@@ -1,4 +1,0 @@
-This is a test file to verify pre-commit hooks are working correctly.
-ESLint max-lines rule: 400 lines ✓
-Husky pre-commit hooks: enabled ✓
-Lint-staged configuration: active ✓ 
