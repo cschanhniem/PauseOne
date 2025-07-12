@@ -16,6 +16,9 @@ install! 'cocoapods',
 prepare_react_native_project!
 
 target 'PauseOne' do
+  use_modular_headers!
+  pod 'Firebase/Analytics'
+  pod 'Firebase/Messaging'
   use_expo_modules!
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'

@@ -56,7 +56,7 @@ Create `eas.json` configuration:
     },
     "production": {
       "android": {
-        "buildType": "aab"
+        "buildType": "app-bundle"
       }
     }
   },
