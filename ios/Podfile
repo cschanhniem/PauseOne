@@ -19,10 +19,10 @@ install! 'cocoapods',
   :disable_input_output_paths => true
 
 # Set the source to GitHub to avoid CDN connectivity issues
-pre_install do |installer|
-  installer.sources.clear
-  installer.sources << 'https://github.com/CocoaPods/Specs.git'
-end
+# pre_install do |installer|
+#   installer.sources.clear
+#   installer.sources << 'https://github.com/CocoaPods/Specs.git'
+# end
 
 prepare_react_native_project!
 
