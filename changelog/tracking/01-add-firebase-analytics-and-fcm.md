@@ -1,7 +1,7 @@
 # Add Firebase Analytics and FCM
 
-- [ ] Install Firebase packages
-- [ ] Configure Firebase for Android
-- [ ] Configure Firebase for iOS
-- [ ] Initialize Firebase in the app
-- [ ] Verify implementation
+- [x] Install Firebase packages
+- [x] Configure Firebase for Android
+- [x] Configure Firebase for iOS
+- [x] Initialize Firebase in the app
+- [x] Verify implementation

@@ -29,6 +29,7 @@ import { AuthProvider } from "./context/AuthContext"
 import { initI18n } from "./i18n"
 import { AppNavigator } from "./navigators/AppNavigator"
 import { useNavigationPersistence } from "./navigators/navigationUtilities"
+import { getFCMToken, onNotification, requestUserPermission } from "./services/firebase"
 import { ThemeProvider } from "./theme/context"
 import { customFontsToLoad } from "./theme/typography"
 import { loadDateFnsLocale } from "./utils/formatDate"
@@ -65,6 +66,12 @@ export function App() {
     initI18n()
       .then(() => setIsI18nInitialized(true))
       .then(() => loadDateFnsLocale())
+  }, [])
+
+  useEffect(() => {
+    requestUserPermission()
+    getFCMToken()
+    onNotification()
   }, [])
 
   // Before we show the app, we have to wait for our state to be ready.
