@@ -95,5 +95,6 @@ web-build/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+!.yarnrc.yml
 
 package-lock.json
