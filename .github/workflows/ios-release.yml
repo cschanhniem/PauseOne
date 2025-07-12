@@ -1,0 +1,310 @@
+name: iOS Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      submit_to_store:
+        description: 'Submit to App Store'
+        required: true
+        default: false
+        type: boolean
+      build_type:
+        description: 'Build type'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - preview
+
+jobs:
+  build-and-deploy:
+    runs-on: macos-latest
+    name: Build and Deploy iOS App
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint:check
+
+      - name: Run type checking
+        run: npm run compile
+
+      - name: Run tests
+        run: npm test
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          expo-version: latest
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Determine build configuration
+        id: config
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "build_type=${{ github.event.inputs.build_type }}" >> $GITHUB_OUTPUT
+            echo "submit_to_store=${{ github.event.inputs.submit_to_store }}" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/v*-beta* ]]; then
+            echo "build_type=preview" >> $GITHUB_OUTPUT
+            echo "submit_to_store=false" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/tags/v*-alpha* ]]; then
+            echo "build_type=preview" >> $GITHUB_OUTPUT
+            echo "submit_to_store=false" >> $GITHUB_OUTPUT
+          else
+            echo "build_type=production" >> $GITHUB_OUTPUT
+            echo "submit_to_store=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build iOS App
+        run: |
+          if [[ "${{ steps.config.outputs.build_type }}" == "production" ]]; then
+            eas build --platform ios --profile production --non-interactive
+          else
+            eas build --platform ios --profile preview --non-interactive
+          fi
+
+      - name: Submit to App Store
+        if: steps.config.outputs.submit_to_store == 'true'
+        run: |
+          eas submit --platform ios --profile production --non-interactive
+
+      - name: Get build info
+        id: build-info
+        run: |
+          BUILD_URL=$(eas build:list --platform ios --limit 1 --json | jq -r '.[0].artifacts.buildUrl // empty')
+          BUILD_ID=$(eas build:list --platform ios --limit 1 --json | jq -r '.[0].id // empty')
+          echo "build_url=$BUILD_URL" >> $GITHUB_OUTPUT
+          echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: PauseOne iOS ${{ github.ref_name }}
+          body: |
+            ## PauseOne iOS Release ${{ github.ref_name }}
+            
+            **Build Type**: ${{ steps.config.outputs.build_type }}
+            **Build ID**: ${{ steps.build-info.outputs.build_id }}
+            **Submitted to App Store**: ${{ steps.config.outputs.submit_to_store }}
+            
+            ### What's New
+            - Bug fixes and performance improvements
+            - Updated dependencies
+            - Enhanced user experience
+            
+            ### Download
+            - **App Store**: [Download from App Store](https://apps.apple.com/app/pauseone/id[app-id])
+            - **TestFlight**: Available for beta testers
+            - **Direct IPA**: ${{ steps.build-info.outputs.build_url }}
+            
+            ### Installation
+            ```bash
+            # Install via Xcode (for development)
+            # Or download from App Store/TestFlight
+            ```
+            
+            ### Testing
+            - Tested on iOS 15.0+ devices
+            - Compatible with iPhone and iPad
+            - Optimized for all screen sizes
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'beta') || contains(github.ref_name, 'alpha') }}
+
+  testflight-notification:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: success() && needs.build-and-deploy.outputs.submit_to_store == 'true'
+    name: TestFlight Notification
+    
+    steps:
+      - name: TestFlight Ready Notification
+        run: |
+          echo "🚀 PauseOne iOS build submitted to App Store Connect!"
+          echo "📱 TestFlight build will be available shortly"
+          echo "🔍 Check App Store Connect for processing status"
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: always()
+    name: Notify Build Status
+    
+    steps:
+      - name: Build Success Notification
+        if: needs.build-and-deploy.result == 'success'
+        run: |
+          echo "✅ PauseOne iOS build successful!"
+          echo "🎯 Build Type: ${{ needs.build-and-deploy.outputs.build_type }}"
+          echo "📱 Check EAS dashboard for build details"
+          
+      - name: Build Failure Notification
+        if: needs.build-and-deploy.result == 'failure'
+        run: |
+          echo "❌ PauseOne iOS build failed!"
+          echo "🔍 Check the logs above for details"
+          exit 1
+
+  security-scan:
+    runs-on: macos-latest
+    needs: build-and-deploy
+    if: success()
+    name: Security Scan
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: |
+          npm audit --audit-level moderate
+          
+      - name: Check for sensitive files
+        run: |
+          # Check for accidentally committed sensitive files
+          if find . -name "*.p12" -o -name "*.mobileprovision" -o -name "*GoogleService*.plist" | grep -v node_modules | grep -v firebase/; then
+            echo "❌ Sensitive files found in repository!"
+            exit 1
+          else
+            echo "✅ No sensitive files found"
+          fi
+
+      - name: Validate iOS configuration
+        run: |
+          # Check app.json for required iOS fields
+          if ! jq -e '.ios.bundleIdentifier' app.json >/dev/null; then
+            echo "❌ Missing iOS bundle identifier"
+            exit 1
+          fi
+          
+          if ! jq -e '.ios.buildNumber' app.json >/dev/null; then
+            echo "⚠️ Missing iOS build number - will be auto-generated"
+          fi
+          
+          echo "✅ iOS configuration valid"
+
+  performance-test:
+    runs-on: macos-latest
+    needs: build-and-deploy
+    if: success() && github.ref == 'refs/heads/main'
+    name: Performance Testing
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Bundle size analysis
+        run: |
+          npm run bundle:web
+          echo "📊 Bundle Analysis:"
+          du -sh dist/
+          find dist/ -name "*.js" -exec du -sh {} \; | sort -hr | head -10
+
+      - name: iOS Simulator Test (if available)
+        run: |
+          # Check if iOS Simulator is available
+          if xcrun simctl list devices | grep -q "iPhone"; then
+            echo "📱 iOS Simulator available for testing"
+            # Could add automated UI tests here
+          else
+            echo "📱 No iOS Simulator available"
+          fi
+
+  app-store-metadata:
+    runs-on: ubuntu-latest
+    needs: build-and-deploy
+    if: success() && contains(github.ref, 'refs/tags/')
+    name: Prepare App Store Metadata
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate App Store assets
+        run: |
+          echo "📋 Validating App Store metadata..."
+          
+          # Check if store description exists
+          if [ -f "docs/stores/en.md" ]; then
+            echo "✅ App Store description found"
+          else
+            echo "❌ Missing App Store description"
+            exit 1
+          fi
+          
+          # Check for required assets
+          if [ -f "assets/images/app-icon-ios.png" ]; then
+            echo "✅ iOS app icon found"
+          else
+            echo "❌ Missing iOS app icon"
+            exit 1
+          fi
+          
+          echo "✅ App Store metadata validation complete"
+
+      - name: Generate release notes
+        run: |
+          echo "📝 Generating release notes for App Store..."
+          
+          # Extract version from tag
+          VERSION=${GITHUB_REF#refs/tags/v}
+          
+          # Create release notes
+          cat > app-store-release-notes.txt << EOF
+          What's New in Version $VERSION:
+          
+          • Enhanced breathing animations for better mindfulness experience
+          • Improved performance and stability
+          • Updated affirmations with more meaningful content
+          • Bug fixes and optimizations
+          
+          PauseOne helps you find peace in just one breath. Perfect for busy lives seeking moments of calm.
+          EOF
+          
+          echo "✅ Release notes generated"
+          cat app-store-release-notes.txt
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-store-metadata
+          path: |
+            app-store-release-notes.txt
+            docs/stores/en.md

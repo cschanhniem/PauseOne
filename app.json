@@ -25,12 +25,15 @@
     "allowBackup": false,
     "edgeToEdgeEnabled": true,
     "permissions": [],
-    "playStoreUrl": "https://play.google.com/store/apps/details?id=com.thayminhtue.pauseone"
+    "playStoreUrl": "https://play.google.com/store/apps/details?id=com.thayminhtue.pauseone",
+    "googleServicesFile": "./firebase/google-services.json"
   },
   "ios": {
     "icon": "./assets/images/app-icon-ios.png",
     "supportsTablet": true,
-    "bundleIdentifier": "com.thayminhtue.pauseone"
+    "bundleIdentifier": "com.thayminhtue.pauseone",
+    "buildNumber": "1",
+    "googleServicesFile": "./firebase/GoogleService-Info.plist"
   },
   "web": {
     "favicon": "./assets/images/app-icon-web-favicon.png",
@@ -56,7 +59,9 @@
           "enforceNavigationBarContrast": false
         }
       }
-    ]
+    ],
+    "@react-native-firebase/app",
+    "@react-native-firebase/messaging"
   ],
   "experiments": {
     "tsconfigPaths": true

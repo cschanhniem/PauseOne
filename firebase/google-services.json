@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "656477956530",
+    "project_id": "pause-one",
+    "storage_bucket": "pause-one.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:656477956530:android:69f6d3401cc54950f65cab",
+        "android_client_info": {
+          "package_name": "com.thayminhtue.pauseone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnYCdjyz8EauUyqHm67FUTCjaQvtLpGfg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
