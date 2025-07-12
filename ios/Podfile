@@ -16,9 +16,6 @@ install! 'cocoapods',
 prepare_react_native_project!
 
 target 'PauseOne' do
-  use_modular_headers!
-  pod 'Firebase/Analytics'
-  pod 'Firebase/Messaging'
   use_expo_modules!
 
   if ENV['EXPO_USE_COMMUNITY_AUTOLINKING'] == '1'
@@ -35,9 +32,6 @@ target 'PauseOne' do
   end
 
   config = use_native_modules!(config_command)
-
-  use_frameworks! :linkage => podfile_properties['ios.useFrameworks'].to_sym if podfile_properties['ios.useFrameworks']
-  use_frameworks! :linkage => ENV['USE_FRAMEWORKS'].to_sym if ENV['USE_FRAMEWORKS']
 
   use_react_native!(
     :path => config[:reactNativePath],
