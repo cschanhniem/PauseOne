@@ -15,12 +15,17 @@
   "android": {
     "icon": "./assets/images/app-icon-android-legacy.png",
     "package": "com.thayminhtue.pauseone",
+    "versionCode": 1,
+    "compileSdkVersion": 34,
+    "targetSdkVersion": 34,
     "adaptiveIcon": {
       "foregroundImage": "./assets/images/app-icon-android-adaptive-foreground.png",
       "backgroundImage": "./assets/images/app-icon-android-adaptive-background.png"
     },
     "allowBackup": false,
-    "edgeToEdgeEnabled": true
+    "edgeToEdgeEnabled": true,
+    "permissions": [],
+    "playStoreUrl": "https://play.google.com/store/apps/details?id=com.thayminhtue.pauseone"
   },
   "ios": {
     "icon": "./assets/images/app-icon-ios.png",
