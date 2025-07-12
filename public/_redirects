@@ -1,0 +1,18 @@
+# Cloudflare Pages Redirects Configuration for PauseOne
+
+# SPA (Single Page Application) fallback
+# All routes should serve the main index.html for client-side routing
+/*    /index.html   200
+
+# Optional: Redirect common paths
+/home    /    301
+/app     /    301
+
+# Optional: Handle old URLs if migrating from another domain
+# /old-path    /new-path    301
+
+# Optional: Force HTTPS (though Cloudflare handles this automatically)
+# http://pauseone.pages.dev/*    https://pauseone.pages.dev/:splat    301
+
+# Optional: Redirect www to non-www (if using custom domain)
+# https://www.pauseone.app/*    https://pauseone.app/:splat    301
