@@ -38,11 +38,16 @@
     },
     "preview:device": {
       "extends": "preview",
-      "ios": { "simulator": false }
+      "ios": {
+        "simulator": false
+      }
     },
     "production": {
       "ios": {
-        "resourceClass": "m-medium"
+        "resourceClass": "m-medium",
+        "env": {
+          "COCOAPODS_DISABLE_STATS": "true"
+        }
       },
       "android": {
         "buildType": "app-bundle",
